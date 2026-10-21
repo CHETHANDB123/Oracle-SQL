@@ -1,0 +1,152 @@
+-- 1
+SELECT employee_id,
+       UPPER(first_name) AS first_name,
+       job_id,
+       salary * 12 AS annual_salary
+FROM employees
+WHERE LENGTH(first_name) > 5
+  AND salary * 12 > 60000
+ORDER BY annual_salary DESC;
+
+-- 2
+SELECT department_id,
+       AVG(salary) AS avg_salary
+FROM employees
+WHERE salary BETWEEN 5000 AND 15000
+  AND commission_pct IS NULL
+GROUP BY department_id
+HAVING AVG(salary) > 8000
+ORDER BY avg_salary DESC;
+
+-- 3
+SELECT job_id,
+       COUNT(*) AS employee_count
+FROM employees
+WHERE job_id LIKE '%M%'
+  AND salary NOT BETWEEN 4000 AND 10000
+GROUP BY job_id
+HAVING COUNT(*) > 2;
+
+-- 4
+SELECT first_name,
+       last_name,
+       LOWER(email) AS email
+FROM employees
+WHERE first_name LIKE 'A%'
+   OR last_name LIKE '%N'
+ORDER BY last_name;
+
+-- 5
+SELECT job_id,
+       min_salary,
+       max_salary,
+       (max_salary - min_salary) AS salary_range
+FROM jobs
+ORDER BY salary_range DESC;
+
+-- 6
+SELECT employee_id,
+       first_name,
+       salary * 1.20 AS revised_salary
+FROM employees
+WHERE department_id IN (50, 80)
+  AND salary < 10000
+ORDER BY revised_salary;
+
+-- 7
+SELECT manager_id,
+       COUNT(*) AS employee_count
+FROM employees
+WHERE salary >= 3000
+  AND manager_id IS NOT NULL
+GROUP BY manager_id
+HAVING COUNT(*) > 2;
+
+-- 8
+SELECT employee_id,
+       first_name,
+       INSTR(first_name, 'A') AS position_of_a
+FROM employees
+WHERE first_name LIKE '%A%'
+  AND department_id IS NOT NULL;
+
+-- 9
+SELECT department_id,
+       COUNT(*) AS employee_count
+FROM employees
+WHERE salary > 5000
+  AND hire_date > TO_DATE('01-JAN-2005','DD-MON-YYYY')
+GROUP BY department_id
+HAVING COUNT(*) >= 3
+ORDER BY employee_count;
+
+-- 10
+SELECT employee_id,
+       LPAD(first_name, 12, '-') AS first_name,
+       last_name
+FROM employees
+WHERE LENGTH(first_name) >= 4
+  AND last_name LIKE '%E%';
+
+-- 11
+SELECT job_id,
+       AVG(salary) AS avg_salary
+FROM employees
+WHERE commission_pct > 0
+   OR salary > 12000
+GROUP BY job_id
+HAVING AVG(salary) > 7000
+ORDER BY avg_salary DESC;
+
+-- 12
+SELECT location_id,
+       TRIM(street_address) AS street_address,
+       postal_code
+FROM locations
+WHERE location_id BETWEEN 1000 AND 3000
+  AND street_address IS NOT NULL;
+
+-- 13
+SELECT employee_id,
+       REPLACE(first_name, 'A', '@') AS first_name,
+       last_name
+FROM employees
+WHERE salary > 6000
+  AND LENGTH(last_name) > 4;
+
+-- 14
+SELECT department_id,
+       SUM(salary) AS total_salary
+FROM employees
+WHERE department_id BETWEEN 20 AND 100
+  AND job_id <> 'SA_REP'
+GROUP BY department_id
+HAVING SUM(salary) > 30000
+ORDER BY total_salary ASC;
+
+-- 15
+SELECT employee_id,
+       first_name,
+       SUBSTR(email, 3) AS email_substring
+FROM employees
+WHERE LENGTH(email) > 7
+  AND employee_id NOT BETWEEN 120 AND 150;
+
+-- 16
+SELECT job_id,
+       SUM(salary) AS total_salary
+FROM employees
+WHERE department_id IN (50, 60)
+  AND salary > 4000
+GROUP BY job_id
+HAVING SUM(salary) > 15000
+ORDER BY total_salary DESC;
+
+-- 17
+SELECT employee_id,
+       first_name,
+       salary - (salary * 0.08) AS net_salary
+FROM employees
+WHERE salary > 5000
+   OR job_id = 'AD_VP'
+ORDER BY net_salary DESC;
