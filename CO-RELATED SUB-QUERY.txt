@@ -1,0 +1,158 @@
+							CO-RELATED SUB-QUERY
+
+
+A Correlated Subquery is a subquery that depends on the outer query for its values.
+
+In simple words:
+- The inner query depends on the outer query.
+- The inner query executes logically for each row processed by the outer query.
+- It uses a column from the outer query inside the inner query.
+
+1. First, understand the question
+WAQTD employees who earn more than the average salary of their respective departments.
+
+For example, imagine the EMP table contains:
+ENAME	SAL	DEPTNO
+SMITH	800	20
+JONES	2975	20
+SCOTT	3000	20
+ALLEN	1600	30
+WARD	1250	30
+BLAKE	2850	30
+
+We need to:
+1. Calculate the average salary of department 20.
+2. Compare each employee's salary in department 20 with that average.
+3. Repeat the same for department 30.
+4. Display employees whose salary is greater than their department's average.
+2. Understand the query line by line
+SELECT E1.ENAME, E1.SAL, E1.DEPTNO
+FROM EMP E1
+WHERE E1.SAL > (
+    SELECT AVG(E2.SAL)
+    FROM EMP E2
+    WHERE E2.DEPTNO = E1.DEPTNO
+);
+
+
+Line 1:
+SELECT E1.ENAME, E1.SAL, E1.DEPTNO
+
+
+We want to display:
+- Employee name
+- Employee salary
+- Department number
+E1 is the alias of the outer query.
+
+Line 2:
+FROM EMP E1
+
+
+We are taking the EMP table and giving it the alias E1.
+
+Think of E1 as the outer query's employee table.
+
+Line 3:
+WHERE E1.SAL > (
+
+
+We are checking whether the employee's salary is greater than a value calculated by the inner query.
+
+Line 4:
+SELECT AVG(E2.SAL)
+FROM EMP E2
+
+
+Here, we calculate the average salary.
+
+E2 is another alias for the same EMP table, used inside the inner query.
+
+Line 5 (MOST IMPORTANT):
+WHERE E2.DEPTNO = E1.DEPTNO
+
+
+Let's understand this carefully.
+- E2.DEPTNO belongs to the inner query.
+- E1.DEPTNO belongs to the outer query.
+This condition tells Oracle:
+
+Calculate the average salary only for the department of the current outer employee.
+
+This dependency makes it a correlated subquery.
+3. How Oracle processes it (example)
+Let's assume the outer query is processing SMITH.
+Step 1: Outer query takes SMITH
+E1 (Outer query)
+ENAME	SAL	DEPTNO
+SMITH	800	20
+
+
+
+Step 2: Inner query runs for department 20
+SELECT AVG(E2.SAL)
+FROM EMP E2
+WHERE E2.DEPTNO = 20;
+
+
+E2 (Inner query)
+
+Finds all employees belonging to department 20 and calculates their average salary.
+
+
+Step 3: Compare salaries
+800 > Department 20 average?
+
+
+FALSE → SMITH is not displayed
+
+Next employee: JONES
+
+Oracle takes JONES's department number and calculates the department 20 average again logically, then compares JONES's salary.
+
+The same process continues for the other employees.
+4. Why are there two aliases E1 and E2?
+This is where many beginners get confused.
+
+We are using the same EMP table twice for two different purposes.
+Alias	Purpose
+E1	Gets the employee whose salary we are checking
+E2	Finds employees in that employee's department to calculate the average
+
+Think of it this way:
+- E1 = Current employee.
+- E2 = Employees in the current employee's department.
+5. Difference between normal and correlated subquery
+Normal subquery:
+SELECT ENAME, SAL
+FROM EMP
+WHERE SAL > (SELECT AVG(SAL) FROM EMP);
+
+
+Here, the inner query calculates the average salary of the entire company.
+It does not depend on the outer query.
+
+Correlated subquery:
+
+
+
+
+SELECT E1.ENAME, E1.SAL
+FROM EMP E1
+WHERE E1.SAL > (
+    SELECT AVG(E2.SAL)
+    FROM EMP E2
+    WHERE E2.DEPTNO = E1.DEPTNO
+);
+
+
+ENAME             SAL     DEPTNO
+---------- ---------- ----------
+ALLEN            1600         30
+JONES            2975         20
+BLAKE            2850         30
+SCOTT            3000         20
+KING             5000         10
+FORD             3000         20
+
+6 rows selected.
